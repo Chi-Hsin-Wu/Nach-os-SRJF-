@@ -213,5 +213,31 @@ Scheduler::Print()
 
 //<TODO>
 //Function definition of sorting rule of readyQueue
+static int CompareThreads(Thread *a, Thread *b) {
+    ）
+    if (a->getBurstTime() < b->getBurstTime()) {
+        return -1; 
+    } else if (a->getBurstTime() > b->getBurstTime()) {
+        return 1; 
+    } else {
+        
+        return (a->getID() > b->getID()) ? -1 : 1; 
+    }
+}
+
+void Scheduler::ReadyToRun (Thread *thread)
+{
+    ASSERT(kernel->interrupt->getLevel() == IntOff);
+    DEBUG(dbgThread, "Putting thread on ready list: " << thread->getName());
+
+    thread->setStatus(READY);
+    readyList->Insert(thread);
+   
+    Thread *currentThread = kernel->currentThread;
+    if (currentThread != NULL && CompareThreads(thread, currentThread) < 0) {
+       
+        kernel->interrupt->YieldOnReturn();
+    }
+}
 
 // <TODO>
